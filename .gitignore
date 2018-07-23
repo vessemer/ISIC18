@@ -1,0 +1,6 @@
+# Data dirs
+data/
+checkpoints/
+attributes_checkpoints/
+checkpoints_full/
+
