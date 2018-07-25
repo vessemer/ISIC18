@@ -3,4 +3,6 @@ data/
 checkpoints/
 attributes_checkpoints/
 checkpoints_full/
+.ipynb_checkpoints
+__pycache__/
 

@@ -97,10 +97,12 @@ pretrained_settings = {
 }
 
 
-def setup_pretrained(model, settings):
+def setup_pretrained(model, settings, same_num_classes):
     sd = model_zoo.load_url(settings['url'])
     msd = model.state_dict()
     sd = {k: v for k, v in sd.items() if k in msd}
+    if not same_num_classes:
+        sd = {k: v for k, v in sd.items() if v.shape == msd[k].shape}
     msd.update(sd)
     model.load_state_dict(msd)
     model.input_space = settings['input_space']
@@ -116,9 +118,7 @@ def dpn68(in_channels, num_classes=1000, pretrained='imagenet'):
         num_classes=num_classes, test_time_pool=True)
     if pretrained:
         settings = pretrained_settings['dpn68'][pretrained]
-        assert num_classes == settings['num_classes'], \
-            "num_classes should be {}, but is {}".format(settings['num_classes'], num_classes)
-        setup_pretrained(model, settings)
+        setup_pretrained(model, settings, num_classes == settings['num_classes'])
     return model
 
 def dpn68b(num_classes=1000, pretrained='imagenet+5k'):
@@ -128,9 +128,7 @@ def dpn68b(num_classes=1000, pretrained='imagenet+5k'):
         num_classes=num_classes, test_time_pool=True)
     if pretrained:
         settings = pretrained_settings['dpn68b'][pretrained]
-        assert num_classes == settings['num_classes'], \
-            "num_classes should be {}, but is {}".format(settings['num_classes'], num_classes)
-        setup_pretrained(model, settings)
+        setup_pretrained(model, settings, num_classes == settings['num_classes'])
     return model
 
 def dpn92(in_channels, num_classes=1000, pretrained='imagenet+5k'):
@@ -140,9 +138,7 @@ def dpn92(in_channels, num_classes=1000, pretrained='imagenet+5k'):
         num_classes=num_classes, test_time_pool=True)
     if pretrained:
         settings = pretrained_settings['dpn92'][pretrained]
-        assert num_classes == settings['num_classes'], \
-            "num_classes should be {}, but is {}".format(settings['num_classes'], num_classes)
-        setup_pretrained(model, settings)
+        setup_pretrained(model, settings, num_classes == settings['num_classes'])
     return model
 
 def dpn98(num_classes=1000, pretrained='imagenet'):
@@ -152,9 +148,7 @@ def dpn98(num_classes=1000, pretrained='imagenet'):
         num_classes=num_classes, test_time_pool=True)
     if pretrained:
         settings = pretrained_settings['dpn98'][pretrained]
-        assert num_classes == settings['num_classes'], \
-            "num_classes should be {}, but is {}".format(settings['num_classes'], num_classes)
-        setup_pretrained(model, settings)
+        setup_pretrained(model, settings, num_classes == settings['num_classes'])
     return model
 
 def dpn131(num_classes=1000, pretrained='imagenet'):
@@ -164,9 +158,7 @@ def dpn131(num_classes=1000, pretrained='imagenet'):
         num_classes=num_classes, test_time_pool=True)
     if pretrained:
         settings = pretrained_settings['dpn131'][pretrained]
-        assert num_classes == settings['num_classes'], \
-            "num_classes should be {}, but is {}".format(settings['num_classes'], num_classes)
-        setup_pretrained(model, settings)
+        setup_pretrained(model, settings, num_classes == settings['num_classes'])
     return model
 
 def dpn107(num_classes=1000, pretrained='imagenet+5k'):
@@ -176,9 +168,7 @@ def dpn107(num_classes=1000, pretrained='imagenet+5k'):
         num_classes=num_classes, test_time_pool=True)
     if pretrained:
         settings = pretrained_settings['dpn107'][pretrained]
-        assert num_classes == settings['num_classes'], \
-            "num_classes should be {}, but is {}".format(settings['num_classes'], num_classes)
-        setup_pretrained(model, settings)
+        setup_pretrained(model, settings, num_classes == settings['num_classes'])
     return model
 
 

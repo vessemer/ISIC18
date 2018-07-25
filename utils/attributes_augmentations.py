@@ -101,48 +101,54 @@ class Augmentation:
 
         self.photometric = iaa.Sequential([
             iaa.Sometimes(
-                .4, 
+                .7, 
                 iaa.OneOf([
                     CLAHE(alpha=(0 * strength, .3 * strength)),
                     iaa.Multiply((1 - .3 * strength, 1 + .3 * strength), per_channel=False),
                     iaa.ContrastNormalization(alpha=(.5 * strength, 1.5 * strength), per_channel=False)
                 ])
             ),
+            #iaa.Sometimes(
+            #    .7, 
+            #    iaa.OneOf([
+            #      iaa.Sharpen(alpha=(0 * strength, .45 * strength), lightness=(1 - .25 * strength, 1 + .4 * strength)),
+            #      iaa.Emboss(alpha=(0 * strength, .45 * strength), strength=(1.0 * strength))
+            #    ])
+            #),
             iaa.Sometimes(
-                .3, 
-                iaa.OneOf([
-                  iaa.Sharpen(alpha=(0 * strength, .45 * strength), lightness=(1 - .25 * strength, 1 + .4 * strength)),
-                  iaa.Emboss(alpha=(0 * strength, .45 * strength), strength=(1.0 * strength))
-                ])
-            ),
-            iaa.Sometimes(
-                .4, 
+                .7, 
                 [OneOf([
                     MotionBlur(alpha=(1., 1.)),
                     iaa.GaussianBlur((0 * strength, 1.5 * strength)),
                     median_blur,
                 ], [.2, .3, .5])]
             ),
-            iaa.Sometimes(.3, iaa.AddToHueAndSaturation((int(-10 * strength), int(10 * strength)), per_channel=.5)), # change hue and saturation
+            iaa.Sometimes(.7, iaa.AddToHueAndSaturation((int(-10 * strength), int(10 * strength)), per_channel=.5)), # change hue and saturation
             iaa.Sometimes(.3, iaa.Grayscale(alpha=(0.0 * strength, .3 * strength))),
-            iaa.Sometimes(.5, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0 * strength, 0.03 * 255 * strength), per_channel=0.5)),
+            iaa.Sometimes(.7, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0 * strength, 0.03 * 255 * strength), per_channel=0.5)),
         ])
         self.photometric = iaa.Sometimes(.95, self.photometric)
 
 
         self.geometric = iaa.Sequential([
             iaa.Sometimes(
-                .7,
+                .8,
                 iaa.Affine(
-                    scale={"x": (1 - .3 * strength, 1 + .2 * strength), "y": (1 - .3 * strength, 1 + .2 * strength)},
-                    translate_percent={"x": (-0.2 * strength, 0.2 * strength), "y": (-0.2 * strength, 0.2 * strength)},
+                    scale={
+                        "x": (1 - .2 * strength, 1 + .3 * strength), 
+                        "y": (1 - .2 * strength, 1 + .3 * strength)
+                    },
+                    translate_percent={
+                        "x": (-0.2 * strength, 0.2 * strength), 
+                        "y": (-0.2 * strength, 0.2 * strength)
+                    },
                     rotate=(-45, 45),
                     order=[0, 1],
                     mode=['symmetric']
                 ),
             ),
             iaa.Sometimes(
-                .6,
+                .8,
                 iaa.OneOf([
                     #iaa.WithChannels([0, 1, 2], iaa.ElasticTransformation(alpha=(0, 1.))),
                     iaa.PerspectiveTransform(scale=(0 * strength, .25 * strength)),
@@ -161,18 +167,26 @@ class Augmentation:
         ])
         self.crop = Crop(window=(side, side), central=False)
         self.valid_geometric = Crop(window=(side, side), central=True)
+        cv2.setNumThreads(0)
 
-    def __call__(self, image, mask, is_test=False, coords=None):
-        patch = np.dstack([image, mask])
+    def __call__(self, image, mask=None, is_test=False, coords=None):
+        if mask is not None:
+            image = np.dstack([image, mask])
+            
         if not is_test:
-            patch = self.crop.augment_image(patch, coords)
+            image = self.crop.augment_image(image, coords)
 
         if not is_test:
-            patch = self.geometric.augment_image(patch)
+            image = self.geometric.augment_image(image)
         else:
-            patch = self.valid_geometric.augment_image(patch)
+            image = self.valid_geometric.augment_image(image)
 
-        image, mask = patch[..., :3], patch[..., 3:]
-        if not is_test:
-            image = self.photometric.augment_image(image)
-        return image, mask
+        if mask is not None:
+            image, mask = image[..., :3], image[..., 3:]
+            if not is_test:
+                image = self.photometric.augment_image(image)
+            return image, mask
+        else:
+            if not is_test:
+                image = self.photometric.augment_image(image)
+            return image

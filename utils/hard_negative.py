@@ -14,7 +14,7 @@ class HardNegativeMiner:
         if loss > self.worst_loss:
             self.cache = {
                 'images': data['images'].numpy(),
-                'masks': data['masks'].numpy(),
+                'class': data['class'].numpy(),
             }
             self.worst_loss = loss
         self.idx += 1
@@ -30,5 +30,5 @@ class HardNegativeMiner:
     def get_cache(self):
         return {
             'images': torch.tensor(self.cache['images']),
-            'masks': torch.tensor(self.cache['masks']),
+            'class': torch.tensor(self.cache['class']),
         }

@@ -4,6 +4,7 @@ from glob import glob
 import cv2
 import numpy as np
 import joblib
+from tqdm import tqdm
 
 import torch
 from torch.utils.data import DataLoader, Dataset
@@ -90,7 +91,7 @@ class ISIC_Dataset(Dataset):
         else:
             paths = paths[part * step : (part + 1) * step]
 
-        for path in paths:
+        for path in tqdm(paths):
             key = os.path.basename(path).split('_')[1]
             tmp = os.path.join(root, 'JPG', '_'.join(['ISIC', key, '{}.jpg']))
             self.paths[int(key)] = {
@@ -99,7 +100,8 @@ class ISIC_Dataset(Dataset):
                     for attr in attributes
                 ],
                 'image': tmp,
-                'amount': amounts[int(key)] if int(key) in amounts.keys() else len(glob(tmp.format('*')))
+                'amount': amounts[int(key)] if (amounts is not None) 
+                and (int(key) in amounts.keys()) else len(glob(tmp.format('*')))
             }
 
         self.keys = list(self.paths.keys())
