@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 from collections import OrderedDict
-from .inplace_abn.abn import InABN
+#from .inplace_abn.abn import InABN
 from .inplace_abn.abn import ABN
 
 __all__ = ['DPN', 'dpn68', 'dpn68b', 'dpn92', 'dpn98', 'dpn131', 'dpn107']
@@ -189,7 +189,7 @@ class BnActConv2d(nn.Module):
     def __init__(self, in_chs, out_chs, kernel_size, stride,
                  padding=0, groups=1, activation_fn=nn.ReLU(inplace=True), iabn=False):
         super(BnActConv2d, self).__init__()
-        self.abn = InABN(in_chs) if iabn else ABN(in_chs)
+        self.abn = ABN(in_chs) if iabn else ABN(in_chs)
         #self.bn = nn.BatchNorm2d(in_chs, eps=0.001)
         #self.act = activation_fn
         self.conv = nn.Conv2d(in_chs, out_chs, kernel_size, stride, padding, groups=groups, bias=False)
@@ -209,7 +209,7 @@ class InputBlock(nn.Module):
             3, num_init_features, kernel_size=kernel_size, stride=2, padding=padding, bias=False)
         #self.bn = nn.BatchNorm2d(num_init_features, eps=0.001)
         #self.act = activation_fn
-        self.abn = InABN(num_init_features)
+        self.abn = ABN(num_init_features)
         self.pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
     def forward(self, x):
