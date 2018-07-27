@@ -82,7 +82,7 @@ def setup_pretrained(model, settings, same_num_classes):
     sd = {k: v for k, v in sd.items() if k in msd}
     if not same_num_classes:
         sd = {k: v for k, v in sd.items() if v.shape == msd[k].shape}
-        print(sd.keys())
+        print('Overlapped keys: {}'.format(len(sd.keys())))
     msd.update(sd)
     model.load_state_dict(msd)
     model.input_space = settings['input_space']

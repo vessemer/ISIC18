@@ -82,3 +82,37 @@ class CyclicLR(object):
                 lr = base_lr + base_height * self.scale_fn(self.last_batch_iteration)
             lrs.append(lr)
         return lrs
+
+
+class ExpLR(object):
+    """Sets the learning rate of each parameter group according to"""
+    def __init__(self, optimizer, src_lr=1e-3, dst_lr=6e-3,
+                 step_size=100, last_batch_iteration=-1):
+
+        self.optimizer = optimizer
+        self.step_size = step_size
+        
+        x = -np.log(src_lr)
+        self.dx = -np.log(dst_lr) - x
+
+        self.linespace = np.linspace(x, x + self.dx, num=step_size)
+
+        self.batch_step(last_batch_iteration + 1)
+        
+    def batch_step(self, batch_iteration=None):
+        if batch_iteration is None:
+            batch_iteration = self.last_batch_iteration + 1
+        self.last_batch_iteration = batch_iteration
+        for param_group, lr in zip(self.optimizer.param_groups, self.get_lr()):
+            param_group['lr'] = lr
+
+    def get_lr(self):
+        cycle = np.floor(self.last_batch_iteration / self.step_size)
+        linespace = self.linespace + self.dx * cycle
+        x = self.last_batch_iteration % self.step_size
+
+        lrs = []
+        for param_group in self.optimizer.param_groups:
+            lr = np.e ** - linespace[x]
+            lrs.append(lr)
+        return lrs
