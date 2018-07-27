@@ -2,9 +2,7 @@ import torch
 import torch.nn as nn
 import sys
 
-sys.path.append('/root/inplace_abn/')
-
-from modules import InPlaceABN
+#from modules import InPlaceABN
 
 
 class ABN(nn.Module):
@@ -19,10 +17,10 @@ class ABN(nn.Module):
         return self.layer(x)
 
 
-class InABN(nn.Module):
-    def __init__(self, in_chs, activation_fn=nn.ReLU(inplace=True)):
-        super(InABN, self).__init__()
-        self.layer = InPlaceABN(in_chs, eps=0.001, activation='relu')
-
-    def forward(self, x):
-        return self.layer(x)
+#class InABN(nn.Module):
+#    def __init__(self, in_chs, activation_fn=nn.ReLU(inplace=True)):
+#        super(InABN, self).__init__()
+#        self.layer = InPlaceABN(in_chs, eps=0.001, activation='relu')
+#
+#    def forward(self, x):
+#        return self.layer(x)
