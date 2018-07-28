@@ -28,12 +28,16 @@ INIT_APPEARENCE = [1.] * 7
 
 
 class ISIC_Dataset(Dataset):
-    def __init__(self, root, df, augmentator=None, aug_params={},
+    def __init__(self, root, df=None, augmentator=None, aug_params={},
                  appearence_mean=INIT_APPEARENCE, is_test=False, 
-                 part=0, partsamount=1, exclude=False, seed=None):
+                 part=0, partsamount=1, exclude=False, seed=None, 
+                 apply_transform=True):
         self.augmentator = augmentator
         self.aug_params = aug_params.copy()
-        self.augmentations = augmentator(**self.aug_params)
+        self.apply_transform = apply_transform
+        self.augmentations = None
+        if augmentator is not None:
+            self.augmentations = augmentator(**self.aug_params)
 
         self.is_test = is_test
         self.paths = {}
@@ -54,9 +58,10 @@ class ISIC_Dataset(Dataset):
 
         for path in tqdm(paths):
             key = os.path.basename(path).split('.')[0]
+            cls = np.where(df.query('image==@key').values[0, 1:])[0] if df is not None else None
             self.paths[key] = {
                 'image': path,
-                'class': np.where(df.query('image==@key').values[0, 1:])[0]
+                'class': cls
             }
 
         self.keys = list(self.paths.keys())
@@ -76,11 +81,17 @@ class ISIC_Dataset(Dataset):
         return len(self.keys)
 
     def __getitem__(self, idx):
-        key = self.keys[idx]
+        key = idx
+        if isinstance(idx, int): 
+            key = self.keys[idx]
+
         img = cv2.imread(self.paths[key]['image'])
         if self.augmentations is not None:
             img = self.augmentations(img, is_test=self.is_test)
-        return img_transform(img), self.paths[key]['class']
+        return (
+            img_transform(img) if self.apply_transform else img, 
+            self.paths[key]['class'] 
+        )
         #{
         #    'images': img_transform(img), 
         #    'class': self.paths[key]['class']#torch.tensor(self.paths[key]['class']).long()
