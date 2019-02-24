@@ -25,7 +25,7 @@
  As an experiment the weights which belongs to the core architecture of FCN was extracted after training over attribute detection task 
  and was used further in classification task. Despite, this did not lead to any notable improvements it still brings diversity in final ensemble.
  The stochastic gradient decent optimization process was selected as training procedure with initial learning rate 5e−4, 
- exponential decay: `lr(i) = lrinit ∗ .95i`, i is epoch number and lies in [0,28] with Nesterov’s momentum
+ exponential decay: `lr(i) = lrinit ∗ .95i`, i is epoch number and lies in [0,28] with Nesterov’s momentum.  
  Confusion matrices for ResNext101, computed during cross-validation:
  ![Conf Matrix](https://habrastorage.org/webt/lx/dg/er/lxdgerz7c-q4btiacdtvathq6po.png)
  
