@@ -9,8 +9,8 @@
  For this task [UNet-like](https://github.com/ternaus/TernausNet) architecture was employed with an encoder chosen to be [dual path network](https://arxiv.org/abs/1707.01629) `DPN68`.  
  
  ## Lesion Attribute Detection
- During [SLIC](http://www.kev-smith.com/papers/SLIC_Superpixels.pdf) driven annotation many attributes masks become obstacle:
- Central row: a crop of skin image acquired from Task 1-2 training set with bright spots of milia-like cyst.
+ During [SLIC](http://www.kev-smith.com/papers/SLIC_Superpixels.pdf) driven annotation many attributes masks become obstacle:  
+ Central row: a crop of skin image acquired from Task 1-2 training set with bright spots of milia-like cyst.  
  Top: predicted spots (small bright spots) overlapped with its annotation (large dim polygons) provided as corresponding ground truth.  
  Bottom: Refined and thresholded enhanced filters segments.  
  ![Segments](https://habrastorage.org/webt/qa/q5/co/qaq5coo99tjfkf3mj-lzarsdtna.png)
